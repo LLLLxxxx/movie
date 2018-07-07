@@ -6,6 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 import config,pymysql,json
 import contextlib
 
+
 app = Flask(__name__)
 app.config.from_object(config)
 db = SQLAlchemy(app)
@@ -44,11 +45,11 @@ class xunlian(db.Model):
 
 @app.route('/data/',methods=['GET'])
 def data():
-    ALL=xunlian.query.filter(xunlian.country=='USA').all()
+    ALL_country=xunlian.query.filter(xunlian.country=='USA').all()
     all_data={}
     ALLDATA=[]
-    while len(ALL)>0:
-        all_xl=ALL.pop()
+    while len(ALL_country)>0:
+        all_xl=ALL_country.pop()
         all_data['NAME']=all_xl.name
         ALLDATA.append(all_data)
         print(ALLDATA)
@@ -56,13 +57,22 @@ def data():
 
     return jsonify(ALLDATA)
 
+@app.route('/tabs/',methods=['GET'])
+def tabs():
+    ALL_level=xunlian.query.filter(xunlian.level!=None).all()
+    all_level={}
+    ALLLEVEL=[]
+    while len(ALL_level)>0:
+        all_l=ALL_level.pop()
+        all_level['LEVEL']=all_l.level
+        ALLLEVEL.append(all_level)
+        all_level={}
+
+    return jsonify(ALLLEVEL),render_template('tabs.html')
+
 @app.route('/',methods=['GET'])
 def index():
     return render_template('index.html')
-
-@app.route('/',methods=['GET'])
-def tabs():
-    return render_template('tabs.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
